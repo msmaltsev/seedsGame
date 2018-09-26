@@ -297,8 +297,6 @@ class Grid():
         show_grid = []
         for i in self.grid:
             show_grid.append(i)
-        print(show_grid)
-        print(self.grid)
 
         pointer_position = self.add_nums_position
 
@@ -309,7 +307,7 @@ class Grid():
         grid_length = len(show_grid)
         grid_length_digits = len(repr(grid_length))
 
-        if len(show_grid) < pointer_position[0]:
+        if len(show_grid) - 1 < pointer_position[0]:
             show_grid.append([self.pointer])
         else:
             rownum = pointer_position[1]
@@ -326,12 +324,10 @@ class Grid():
             line = line_index + ' '.join(arr)
             result += '%s\n'%line
 
-        print('SELF GRID', self.grid)
-
         print('---------------------')
         print(result)
         print('---------------------')
-
+    
 
 if __name__ == '__main__':
 
