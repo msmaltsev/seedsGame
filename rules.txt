@@ -1,0 +1,15 @@
+seedsGame Rules:
+
+Player has to find pairs of numbers that are equal or sum up to 10
+
+Example:
+Valid pairs: (1, 1), (2, 8), (6, 4)
+Invalid pairs: (1, 4), (2, 6)
+
+There must be no numbers between pair members
+
+Console version of the game lets you point on the pair by typing in coordinates of each number. Row number goes first, column number goes second.try:
+    
+As player runs out of available pairs on the grid, new numbers row is added automatically.
+
+Have a nice play!
