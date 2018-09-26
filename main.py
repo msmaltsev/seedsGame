@@ -36,12 +36,14 @@ def main():
         g.addNums(g.add_nums_position, g.numsToAdd())
         g.refreshGrid()
         g.printGrid()
+        if args.show_pairs:
+            print('AVAILABLE PAIRS:', g.pairlist)
 
 
 if __name__ == '__main__':
 
     if args.show_rules:
-        
+
         f = open('rules.txt', 'r', encoding='utf8').read()
         print(f)
 
