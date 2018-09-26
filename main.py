@@ -6,6 +6,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-p', dest='show_pairs', action='store_true', default=False, help='available pairs will be shown on each step')
+parser.add_argument('-r', '--rules', dest='show_rules', action='store_true', default=False, help='show rules and quit')
 args = parser.parse_args()
 
 
@@ -38,4 +39,11 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+
+    if args.show_rules:
+        
+        f = open('rules.txt', 'r', encoding='utf8').read()
+        print(f)
+
+    else:
+        main()
