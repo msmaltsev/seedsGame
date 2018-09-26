@@ -1,6 +1,9 @@
 #/usr/local/bin/python3
 # -*- coding: utf-8 -*-
 
+import os
+from copy import deepcopy
+
 class Grid():
 
     def __init__(self):
@@ -135,6 +138,10 @@ class Grid():
 
 
     def findHorizontalPairs(self): # pairs in rows
+        
+        # print('looking for HORIZONTAL pairs in grid:')
+        # print(self.grid)
+
         pairs = []
         for arr_num in range(0, len(self.grid)):
             arr = self.grid[arr_num]
@@ -169,6 +176,9 @@ class Grid():
 
 
     def findVerticalPairs(self): # pairs in columns
+        
+        # print('looking for VERTICAL pairs in grid:')
+        # print(self.grid)
 
         pairs = []
         for i in range(self.width):
@@ -210,6 +220,10 @@ class Grid():
 
 
     def findEdgePairs(self): # pairs on beginnings and ends of lines
+        
+        # print('looking for EDGE pairs in grid:')
+        # print(self.grid)
+
         pairs = []
 
         rownum = 1
@@ -220,7 +234,7 @@ class Grid():
             while self.grid[rownum - 1][a_last_index] == self.sep:
                 a_last_index -= 1
             a = int(self.grid[rownum - 1][a_last_index])
-            a_coord = [rownum - 1, self.width - 1]
+            a_coord = [rownum - 1, self.width + a_last_index]
 
             b_last_index = 0
             while self.grid[rownum][b_last_index] == self.sep:
@@ -243,8 +257,7 @@ class Grid():
         vertical_pairs = self.findVerticalPairs()
         edge_pairs = self.findEdgePairs()
         all_pairs = horizontal_pairs + vertical_pairs + edge_pairs
-        all_pairs_rev = [(i[1], i[0]) for i in all_pairs]
-        return all_pairs + all_pairs_rev
+        return all_pairs
     
     
     def getPairCoords(self):
@@ -294,9 +307,10 @@ class Grid():
 
     def printGrid(self, verbose = False):
 
-        show_grid = []
-        for i in self.grid:
-            show_grid.append(i)
+        if not verbose:
+            os.system('clear')
+
+        show_grid = deepcopy(self.grid)
 
         pointer_position = self.add_nums_position
 
