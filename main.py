@@ -12,7 +12,7 @@ import os
 parser = argparse.ArgumentParser()
 parser.add_argument('-p', dest='show_pairs', action='store_true', default=False, help='available pairs will be shown on each step')
 parser.add_argument('-r', '--rules', dest='show_rules', action='store_true', default=False, help='show rules and quit')
-parser.add_argument('-v', dest='verbose', action = 'store_true', default=False, help='print info')
+parser.add_argument('-v', dest='verbose', action = 'store_true', default=False, help='verbose mode - every step is printed out')
 args = parser.parse_args()
 
 
