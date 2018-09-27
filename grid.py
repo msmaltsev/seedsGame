@@ -198,7 +198,7 @@ class Grid():
         print(result)
 
     
-    def renderGrid(self):
+    def renderGrid(self, message = ''):
 
         os.system('clear')
 
@@ -237,7 +237,7 @@ class Grid():
         print('------------------------')
         print(result)
         print('------------------------')
-
+        print(message)
 
 
 if __name__ == '__main__':
