@@ -13,7 +13,7 @@ args = parser.parse_args()
 def main(auto = args.auto):
 
     if auto:
-        log = open('log', 'w', encoding='utf8').close()
+        log = open('autoplay_log', 'w', encoding='utf8').close()
     else:
         log = open('log', 'w', encoding='utf8').close()
 
