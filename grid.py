@@ -8,7 +8,7 @@ class Grid():
 
     def __init__(self):
 
-        strt_nums = [str(i) for i in range(1,20) if '0' not in str(i)]
+        strt_nums = [str(i) for i in range(1,80) if '0' not in str(i)]
         strt_nums = [int(i) for i in ''.join(list(strt_nums))]
 
         self.width = 9
@@ -234,7 +234,7 @@ class Grid():
             line = line_index + ' '.join(arr)
             result += '%s\n'%line
 
-        head = ' ' + ' ' * (vertc_space_length - len(str_rownum)) + '   ' + ' '.join([str(i) for i in range(0, self.width)])
+        head = ' ' * len(str_rownum) + '    ' + ' '.join([str(i) for i in range(0, self.width)])
         result = '%s\n\n%s'%(head, result)
 
         print('------------------------')
