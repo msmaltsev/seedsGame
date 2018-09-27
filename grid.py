@@ -1,7 +1,7 @@
 #/usr/local/bin/python3
 # -*- coding: utf-8 -*-
 
-import os
+import os, platform
 from copy import deepcopy
 
 class Grid():
@@ -200,7 +200,10 @@ class Grid():
     
     def renderGrid(self, message = ''):
 
-        os.system('clear')
+        if platform.version() == 'Windows':
+            os.system('cls')
+        else:
+            os.system('clear') 
 
         result = ''
 
@@ -243,6 +246,3 @@ class Grid():
 if __name__ == '__main__':
 
     pass
-
-
-
