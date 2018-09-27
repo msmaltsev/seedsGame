@@ -15,13 +15,11 @@ if __name__ == '__main__':
     g.addNums(g.add_nums_position, g.strt_nums)
     g.refreshGrid()
     g.renderGrid()
-    nopairmessage = ''
 
     while True:
 
         while len(g.pairlist) > 0:
 
-            print(nopairmessage)
             if g.show_pairs:
                 g.printPairlist()
 
@@ -29,17 +27,16 @@ if __name__ == '__main__':
             if users_pair in g.pairlist:
                 for coord in users_pair:
                     g.substByCoordinate(coord)
-                nopairmessage = ''
+                g.refreshGrid()
+                g.renderGrid()
             else:
-                nopairmessage = 'No such pair!'
-            g.refreshGrid()
-            g.renderGrid()
+                g.refreshGrid()
+                g.renderGrid(message = 'no such pair!')
 
-        print('No pairs left, adding new row...')
         new_nums_row = g.getNewNumsRow()
         g.addNums(g.add_nums_position, new_nums_row)
         g.refreshGrid()
-        g.renderGrid()
+        g.renderGrid(message = 'no pairs left, new row added')
 
 
 
