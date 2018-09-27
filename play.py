@@ -1,13 +1,13 @@
 #/usr/local/bin/python3
 # -*- coding: utf-8 -*-
 
-import argparse, time, re, random
+import argparse, time, re, random, sys
 from grid import *
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-p', dest='show_pairs', action='store_true', default=False, help='available pairs will be shown on each step')
 parser.add_argument('-a', dest='auto', action='store_true', default=False, help='autoplay')
-parser.add_argument('-r', dest='repl', action='store_true', default=False, help='autoplay')
+parser.add_argument('-r', dest='repl', action='store_true', default=False, help='replay')
 args = parser.parse_args()
 
 def main(auto = args.auto):
@@ -72,6 +72,13 @@ def main(auto = args.auto):
 
 def replay(logfile = 'log'):
 
+    try:
+        log = open(logfile, 'r', encoding='utf8')
+    except:
+        print('no log provided, can not run')
+        sys.exit()
+
+
     g = Grid()
     g.show_pairs = args.show_pairs
     g.addNums(g.add_nums_position, g.strt_nums)
@@ -79,7 +86,6 @@ def replay(logfile = 'log'):
     g.renderGrid()
     time.sleep(0.5)
 
-    log = open(logfile, 'r', encoding='utf8')
     for line in log:
         print(line)
         m = re.search('\(([0-9]+), ([0-9]+)\)', line)
@@ -99,7 +105,7 @@ def replay(logfile = 'log'):
                 g.renderGrid()
 
 if __name__ == '__main__':
-    if repl:
+    if args.repl:
         replay()
     else:
         main()
