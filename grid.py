@@ -14,336 +14,235 @@ class Grid():
         self.width = 9
         self.sep = ' '
         self.pointer = '>'
+        self.pointer_position = 0
         self.grid = []
         self.pairlist = []
         self.available_pairs = False
-        self.add_nums_position = (0,0) # (row, col)
-
+        self.add_nums_position = 0
         self.strt_nums = strt_nums
+        self.show_pairs = False
 
 
-    def addNums(self, position, nums_row, verbose = False):
+    def getNewNumsRow(self):
+        new_nums = [i for i in self.grid if i != self.sep]
+        return new_nums
 
-        if verbose:
-            print('adding nums:', nums_row)
 
-        if self.grid == []:
-            self.grid = [[]]
+    def addNums(self, add_nums_position, new_nums_row):
+        self.grid = self.grid[:add_nums_position]
+        self.grid += new_nums_row
+        self.add_nums_position = len(self.grid)
 
-        col = position[1]
-        if col == 0 and self.grid != [[]]:
-            self.grid.append([])
 
-        grid_last_row = self.grid[-1]
-        grid_last_row_cut = grid_last_row[:col]
-        first_slice_len = self.width - len(grid_last_row_cut)
-        first_slice, rest = nums_row[:first_slice_len], nums_row[first_slice_len:]
+    def getNumIndex(self, x, y):
+        return self.width * x + y
 
-        new_grid_last_row_upd = grid_last_row_cut + first_slice
-
-        if rest == []:
-
-            add_nums_position_row = len(self.grid) - 1
-            add_nums_position_col = len(new_grid_last_row_upd)
-
-            if add_nums_position_col >= self.width:
-                add_nums_position_row += 1
-                add_nums_position_col = 0
-
-            self.add_nums_position = (
-                add_nums_position_row,
-                add_nums_position_col
-            )
-            while len(new_grid_last_row_upd) < self.width:
-                new_grid_last_row_upd.append(' ')
-            
-            self.grid[-1] = new_grid_last_row_upd
-
-        else:
-            
-            self.grid[-1] = new_grid_last_row_upd
-            rest_rows = []
-
-            cnt = 0
-            row = []
-            while cnt < len(rest):
-                row.append(rest[cnt])
-                if len(row) == self.width:
-                    rest_rows.append(row)
-                    row = []
-                cnt += 1
-            if row != []:
-                rest_rows.append(row)
-
-            for row in rest_rows:
-                self.grid.append(row)
-
-            last_row = self.grid[-1]
-            # print(last_row)
-
-            add_nums_position_row = len(self.grid) - 1
-            add_nums_position_col = len(last_row)
-
-            # print('coord:', add_nums_position_row, add_nums_position_col)
-                
-            if add_nums_position_col >= self.width:
-                add_nums_position_row += 1
-                add_nums_position_col = 0
-
-            self.add_nums_position = (
-                add_nums_position_row,
-                add_nums_position_col
-            )
-
-            while len(last_row) < self.width:
-                last_row.append(self.sep)
-            
     
-    def nextNumsPosition(self):
+    def getPairCoords(self):
 
-        last_row = self.grid[-1]
+        print('FIRST ROW THEN COL')
 
-        if last_row[-1] == self.sep:
-            vertical_coord = len(self.grid) - 1
-            horizontal_coord = len(last_row) - 1
-            while last_row[-1] == self.sep:
-                horizontal_coord -= 1
-        else:
-            horizontal_coord = 0
-            vertical_coord = len(self.grid)
+        a_x = self.validatedInput('1st x: ', 'bad type. 1st_x: ')
+        a_y = self.validatedInput('1st y: ', 'bad type. 1st y: ')
+        b_x = self.validatedInput('2nd x: ', 'bad type. 2nd x: ')
+        b_y = self.validatedInput('2nd y: ', 'bad type. 2nd y: ')
+        
+        a_num_index = self.getNumIndex(a_x, a_y)
+        b_num_index = self.getNumIndex(b_x, b_y)
 
-        return (horizontal_coord, vertical_coord)
-    
+        pair = (a_num_index, b_num_index)
 
-    def substByCoordinate(self, x, y):
-        x_arr = self.grid[x]
-        x_arr[y] = self.sep
-        self.grid[x] = x_arr
-        return self.grid
+        return pair
+
+
+    def validatedInput(self, caption, mistake_caption, allowed_type = 'int', max_attempts = 0):
+        if max_attempts == 0:
+            max_attempts = 1000000
+        attempts = 0
+        type_is_right = False
+        value = input(caption)
+        while not type_is_right:
+            if attempts < max_attempts:
+                try:
+                    value = eval('%s("%s")'%(allowed_type, value))
+                    type_is_right = True
+                    break
+                except Exception as e:
+                    attempts += 1
+                    value = input(mistake_caption)
+            else:
+                print('too much attempts. killing program')
+                sys.exit()
+
+        return value
 
 
     def isValidPair(self, a, b):
+        a, b = int(a), int(b)
         if a == b or a + b == 10:
             return True
         else:
             return False
 
 
-    def isPair(arr, index_a, index_b):
-        btw = arr[index_a + 1:index_b]
-        if btw == [] or list(set(btw)) == [self.sep]:
-            return True
-        else:
-            return False
+    def substByCoordinate(self, coord):
+        self.grid[coord] = self.sep
 
 
-    def findHorizontalPairs(self): # pairs in rows
-        
-        # print('looking for HORIZONTAL pairs in grid:')
-        # print(self.grid)
+    def findXPairs(self):
+
+        search_grid = deepcopy(self.grid)
+        while search_grid[-1] == self.sep:
+            search_grid = search_grid[:-1]
 
         pairs = []
-        for arr_num in range(0, len(self.grid)):
-            arr = self.grid[arr_num]
 
-            while arr[-1] == self.sep:
-                arr = arr[:-1]
+        index = 0
+        while index < len(search_grid) - 1:
+            fst_index = index
+            fst_value = search_grid[fst_index]
+            if fst_value == self.sep:
+                try:
+                    index += 1
+                    continue
+                except:
+                    break
+            # print('fst_index: %s'%fst_index)
+            # print('fst_value: %s'%fst_value)
+            snd_index = fst_index + 1
+            snd_value = search_grid[snd_index]
+            while snd_value == self.sep:
+                try:
+                    snd_index += 1
+                    snd_value = search_grid[snd_index]
+                except: break
+            # print('snd_index: %s'%snd_index)
+            # print('snd_value: %s'%snd_value)
+            # print(fst_value, snd_value)
+            if self.isValidPair(fst_value, snd_value):
+                pairs.append((fst_index, snd_index))
 
-            horizontal_coord = arr_num
-            vertical_coord = 0
-            while arr[vertical_coord] == self.sep:
-                vertical_coord += 1
-            while vertical_coord < len(arr) - 1:
+            index = snd_index
 
-                next_vertical_coord = vertical_coord + 1
-                while arr[next_vertical_coord] == self.sep:
-                    if next_vertical_coord < self.width - 1:
-                        next_vertical_coord = next_vertical_coord + 1
-                    else:
-                        break
-
-                fst_num = int(arr[vertical_coord])
-                snd_num = int(arr[next_vertical_coord])
-
-                if self.isValidPair(fst_num, snd_num):
-                    pairs.append((
-                        [horizontal_coord, vertical_coord], # first in pair
-                        [horizontal_coord, next_vertical_coord] # second in pair
-                    ))
-
-                vertical_coord = next_vertical_coord
         return pairs
 
 
-    def findVerticalPairs(self): # pairs in columns
-        
-        # print('looking for VERTICAL pairs in grid:')
-        # print(self.grid)
+    def findYPairs(self):
 
         pairs = []
+
+        turned_grid = []
         for i in range(self.width):
-            arr = [a[i] for a in self.grid]
+            col = [(self.grid[k], k) for k in range(len(self.grid)) if k % self.width == i]
+            turned_grid += col
 
-            if list(set(arr)) == [self.sep]:
+        turned_grid = [k for k in turned_grid if k[0] != self.sep]
+
+        index = 0
+        while index < len(turned_grid) - 1:
+            fst_index = index
+            fst_tuple = turned_grid[fst_index]
+            fst_value = fst_tuple[0]
+
+            if fst_value == self.sep:
+                index += 1
                 continue
-            else:
 
-                while arr[-1] == self.sep:
-                    arr = arr[:-1]
+            snd_index = fst_index + 1
+            snd_tuple = turned_grid[snd_index]
+            snd_value = snd_tuple[0]
 
-                vertical_coord = i
-                horizontal_coord = 0
+            while snd_value == self.sep:
+                snd_index += 1
+                snd_tuple = turned_grid[snd_index]
+                snd_value = snd_tuple[0]
 
-                while arr[horizontal_coord] == self.sep:
-                    horizontal_coord += 1
+            if self.isValidPair(fst_value, snd_value):
+                fst_i = fst_tuple[1]
+                snd_i = snd_tuple[1]
+                if fst_i < snd_i:
+                    pairs.append((fst_i, snd_i))
 
-                while horizontal_coord < len(arr) - 1:
-
-                    next_horizontal_coord = horizontal_coord + 1
-                    while arr[next_horizontal_coord] == self.sep:
-                        if next_horizontal_coord < self.width:
-                            next_horizontal_coord = next_horizontal_coord + 1
-                        else:
-                            break
-
-                    fst_num = int(arr[horizontal_coord])
-                    snd_num = int(arr[next_horizontal_coord])
-
-                    if self.isValidPair(fst_num, snd_num):
-                        pairs.append((
-                            [horizontal_coord, vertical_coord],
-                            [next_horizontal_coord, vertical_coord]
-                            ))
-
-                    horizontal_coord = next_horizontal_coord
-        return pairs
-
-
-    def findEdgePairs(self): # pairs on beginnings and ends of lines
-        
-        # print('looking for EDGE pairs in grid:')
-        # print(self.grid)
-
-        pairs = []
-
-        rownum = 1
-
-        while rownum != len(self.grid) - 1:
-
-            a_last_index = -1
-            while self.grid[rownum - 1][a_last_index] == self.sep:
-                a_last_index -= 1
-            a = int(self.grid[rownum - 1][a_last_index])
-            a_coord = [rownum - 1, self.width + a_last_index]
-
-            b_last_index = 0
-            while self.grid[rownum][b_last_index] == self.sep:
-                b_last_index += 1
-
-            b = int(self.grid[rownum][b_last_index])
-            b_coord = [rownum, b_last_index]
-
-            if self.isValidPair(a, b):
-                pairs.append((a_coord, b_coord))
-
-            rownum += 1
+            index = snd_index
 
         return pairs
 
 
-    def getAllPairs(self):
+    def refreshGrid(self):
+
+        while len(self.grid) % self.width != 0:
+            self.grid.append(self.sep)
         
-        horizontal_pairs = self.findHorizontalPairs()
-        vertical_pairs = self.findVerticalPairs()
-        edge_pairs = self.findEdgePairs()
-        all_pairs = horizontal_pairs + vertical_pairs + edge_pairs
-        return all_pairs
-    
-    
-    def getPairCoords(self):
-        a_x = int(input('1st horiz: '))
-        a_y = int(input('1st vertc: '))
-        b_x = int(input('2nd horiz: '))
-        b_y = int(input('2nd vertc: '))
-        return ([a_x, a_y], [b_x, b_y])
+        x_pairs = self.findXPairs()
+        y_pairs = self.findYPairs()
+        pairs = x_pairs + y_pairs
+        reverse_pairs = [(i[1], i[0]) for i in pairs]
+        pairs += reverse_pairs
+        self.pairlist = pairs
 
 
-    def comparePairs(self, user_pairs_arr):
-        for p in self.pairlist:
-            if p == user_pairs_arr:
-                pass
+    def computeCoordinates(self, coord):
+        return (int(coord / self.width), coord % self.width)
 
 
-    def refreshGrid(self, verbose = False):
+    def printPairlist(self):
 
-        ap = self.getAllPairs()
-        self.pairlist = ap
-        if len(ap) == 0:
-            self.available_pairs = False
-        else:
-            self.available_pairs = True
-
-        if verbose:
-            print('available_pairs: ', self.pairlist)
-            print('add_nums_position: ', self.add_nums_position)
-
-
-    def numsToAdd(self):
-        grid_sum = [i for i in self.collectFromList(self.grid) if i != self.sep]
-        return grid_sum
-
-
-    def collectFromList(self, list_of_lists):
-        ## берет на вход список списков
-        ## возвращает сумму этих списков
         result = []
-        for i in list_of_lists:
-            if type(i) == list:
-                result += self.collectFromList(i)
-            else:
-                result.append(i)
-        return result
 
+        for p in self.pairlist:
+            first = self.computeCoordinates(p[0])
+            second = self.computeCoordinates(p[1])
 
-    def printGrid(self, verbose = False):
+            result.append((first, second))
 
-        if not verbose:
-            os.system('clear')
+        print(result)
 
-        show_grid = deepcopy(self.grid)
+    
+    def renderGrid(self):
 
-        pointer_position = self.add_nums_position
+        os.system('clear')
 
-        if verbose:
-            print('GRID ROWS:', show_grid)
-            print('POINTER POSITION: ', pointer_position)
+        result = ''
 
-        grid_length = len(show_grid)
-        grid_length_digits = len(repr(grid_length))
+        grid_to_show = deepcopy(self.grid)
+        try:
+            grid_to_show[self.add_nums_position] = self.pointer
+        except:
+            grid_to_show.append(self.pointer)
 
-        if len(show_grid) - 1 < pointer_position[0]:
-            show_grid.append([self.pointer])
-        else:
-            rownum = pointer_position[1]
-            colnum = pointer_position[0]
-            show_grid[colnum][rownum] = self.pointer
+        arr_to_show = []
+        row = []
+        for i in grid_to_show:
+            row.append(i)
+            if len(row) == self.width:
+                arr_to_show.append(row)
+                row = []
+        if row != []:
+            arr_to_show.append(row)
 
-        head = ' ' * grid_length_digits + '   ' + ' '.join([str(i) for i in range(0, self.width)])
-        result = '%s\n\n'%head
-
-        for arrnum in range (len(show_grid)):
-            str_arrnum = str(arrnum)
-            arr = [str(i) for i in show_grid[arrnum]]
-            line_index = str_arrnum + ' ' * (grid_length_digits - len(str_arrnum)) + '   '
+        horiz_coords = range(self.width - 1)
+        vertc_coords = range(len(arr_to_show) - 1)
+        vertc_space_length = len(repr(len(grid_to_show)))
+        
+        for rownum in range(len(arr_to_show)):
+            str_rownum = str(rownum)
+            arr = [str(i) for i in arr_to_show[rownum]]
+            line_index = str_rownum + ' ' * (vertc_space_length - len(str_rownum)) + '   '
             line = line_index + ' '.join(arr)
             result += '%s\n'%line
 
-        print('---------------------')
+        head = ' ' + ' ' * (vertc_space_length - len(str_rownum)) + '   ' + ' '.join([str(i) for i in range(0, self.width)])
+        result = '%s\n\n%s'%(head, result)
+
+        print('------------------------')
         print(result)
-        print('---------------------')
-    
+        print('------------------------')
+
+
 
 if __name__ == '__main__':
 
-    g = Grid()
-    g.printGrid()
+    pass
+
+
+
