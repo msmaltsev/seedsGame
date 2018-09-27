@@ -8,7 +8,7 @@ class Grid():
 
     def __init__(self):
 
-        strt_nums = [str(i) for i in range(1,80) if '0' not in str(i)]
+        strt_nums = [str(i) for i in range(1,20) if '0' not in str(i)]
         strt_nums = [int(i) for i in ''.join(list(strt_nums))]
 
         self.width = 9
@@ -172,6 +172,16 @@ class Grid():
 
         while len(self.grid) % self.width != 0:
             self.grid.append(self.sep)
+
+        if len(self.grid) != 0:
+            strt = 0
+            fnsh = strt + self.width - 1
+            while fnsh < len(self.grid):
+                pseudorow = self.grid[strt : fnsh]
+                if list(set(pseudorow)) == [' ']:
+                    self.grid = self.grid[:strt] + self.grid[fnsh + 1:]
+                strt += self.width
+                fnsh += self.width
         
         x_pairs = self.findXPairs()
         y_pairs = self.findYPairs()
