@@ -1,80 +1,46 @@
 #/usr/local/bin/python3
 # -*- coding: utf-8 -*-
 
-# 1) находит инвалидные пары
-# 2) разворачивать пару, введённу. пользователем
-# 3) очистка экрана после каждого хода
-
-from grid import *
 import argparse
-import os
+from grid import *
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-p', dest='show_pairs', action='store_true', default=False, help='available pairs will be shown on each step')
-parser.add_argument('-r', '--rules', dest='show_rules', action='store_true', default=False, help='show rules and quit')
-parser.add_argument('-v', dest='verbose', action = 'store_true', default=False, help='verbose mode - every step is printed out')
 args = parser.parse_args()
 
-
-def main():
-
-    verbose = args.verbose
-
+if __name__ == '__main__':
+    
     g = Grid()
+    g.show_pairs = args.show_pairs
     g.addNums(g.add_nums_position, g.strt_nums)
-    if verbose:
-        print('REFRESHING GRID')
     g.refreshGrid()
-    if verbose:
-        print('PRINTING REFRESHED GRID')
-    g.printGrid(verbose)
-    if args.show_pairs:
-        print('AVAILABLE PAIRS:', g.pairlist)
-    if verbose:
-        print(g.grid)
-
+    g.renderGrid()
+    nopairmessage = ''
 
     while True:
 
-        while g.available_pairs:
+        while len(g.pairlist) > 0:
 
-            user_pair_coords = g.getPairCoords()
-            user_pair_coords_inverse = (user_pair_coords[1], user_pair_coords[0])
-            for pair in [user_pair_coords, user_pair_coords_inverse]:
-                if pair in g.pairlist:
-                    for coords in user_pair_coords:
-                        g.substByCoordinate(coords[0], coords[1])
-                    break
-            if verbose:
-                print('REFRESHING GRID')
+            print(nopairmessage)
+            if g.show_pairs:
+                g.printPairlist()
+
+            users_pair = g.getPairCoords()
+            if users_pair in g.pairlist:
+                for coord in users_pair:
+                    g.substByCoordinate(coord)
+                nopairmessage = ''
+            else:
+                nopairmessage = 'No such pair!'
             g.refreshGrid()
-            if verbose:
-                print('PRINTING REFRESHED GRID')
-            g.printGrid(verbose)
-            if args.show_pairs:
-                print('AVAILABLE PAIRS:', g.pairlist)
-            if verbose:
-                print(g.grid)
+            g.renderGrid()
 
-        print('no more pairs available!')
-        g.addNums(g.add_nums_position, g.numsToAdd())
-        if verbose:
-            print('REFRESHING GRID')
+        print('No pairs left, adding new row...')
+        new_nums_row = g.getNewNumsRow()
+        g.addNums(g.add_nums_position, new_nums_row)
         g.refreshGrid()
-        if verbose:
-            print('PRINTING REFRESHED GRID')
-        g.printGrid(verbose)
-        if args.show_pairs:
-            print('AVAILABLE PAIRS:', g.pairlist)
-        if verbose:
-            print(g.grid)
+        g.renderGrid()
 
-if __name__ == '__main__':
 
-    if args.show_rules:
 
-        f = open('rules.txt', 'r', encoding='utf8').read()
-        print(f)
 
-    else:
-        main()
