@@ -52,7 +52,7 @@ class Grid():
 
         pair = (a_num_index, b_num_index)
 
-        return pair
+        return pair, ((a_x, a_y), (b_x, b_y))
 
 
     def validatedInput(self, caption, mistake_caption, allowed_type = 'int', max_attempts = 0):
@@ -244,5 +244,4 @@ class Grid():
 
 
 if __name__ == '__main__':
-
     pass
