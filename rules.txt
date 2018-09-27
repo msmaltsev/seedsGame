@@ -1,6 +1,7 @@
 seedsGame Rules:
 
 Player has to find pairs of numbers that are equal or sum up to 10
+Numbers may be matched horizontally, vertically, or between rows as soon as they are located on rows edges
 
 Example:
 Valid pairs: (1, 1), (2, 8), (6, 4)
